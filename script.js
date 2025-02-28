@@ -15,7 +15,7 @@ async function loadWords() {
     try {
         const response = await fetch("words.csv"); // Load CSV file
         const data = await response.text();
-        wordList = data.split("\n").map(word => word.trim().toUpperCase()); // Convert to uppercase
+        wordList = data.split("\n").map(word => word.trim().toUpperCase()).filter(word => word.length >= 3); // Convert to uppercase
         initializeGame();
     } catch (error) {
         console.error("Error loading words:", error);
@@ -65,12 +65,23 @@ function handleGuess(letter) {
 
     guessedLetters.push(letter);
 
+    // Disable the selected letter and highlight it
+    let buttons = document.querySelectorAll("#keyboard button");
+    buttons.forEach(button => {
+        if (button.textContent === letter) {
+            button.disabled = true; // Disable the button
+            button.style.backgroundColor = "#ccc"; // Change color to indicate selection
+            button.style.color = "#666"; // Dim the text color
+            button.style.cursor = "not-allowed"; // Change cursor to indicate it's disabled
+        }
+    });
+
     if (selectedWord.includes(letter)) {
         updateWordDisplay();
         checkWin();
     } else {
         incorrectGuesses++;
-        hangmanImage.src = `images/hangman${incorrectGuesses}.png`; // Update Hangman image
+        hangmanImage.src = `images/hangman${incorrectGuesses}.png`;
         checkLoss();
     }
 }
